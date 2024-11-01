@@ -7,6 +7,12 @@ const ScanData = require('./models/ScanData');
 const app = express();
 app.use(express.json()); // Middleware para analizar JSON
 
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://vercel.live; img-src 'self' data: https://*; connect-src 'self' https://vercel.live");
+    next();
+});
+
+
 // Conectar a MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Conectado a MongoDB Atlas'))
