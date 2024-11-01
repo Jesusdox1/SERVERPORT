@@ -18,6 +18,12 @@ mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Conectado a MongoDB Atlas'))
   .catch(err => console.error('Error al conectar a MongoDB Atlas:', err));
 
+// Ruta para la raíz del servidor
+app.get('/', (req, res) => {
+    res.send('<h1>Bienvenido al Servidor de Escaneo de Puertos</h1>');
+});
+
+
 // Ruta para recibir y almacenar los datos de escaneo de puertos
 app.post('/api/puertos', async (req, res) => {
     const { ip, puertos_abiertos } = req.body;
