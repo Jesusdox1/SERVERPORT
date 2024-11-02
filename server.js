@@ -7,20 +7,34 @@ const ScanData = require('./models/ScanData');
 const app = express();
 app.use(express.json()); // Middleware para analizar JSON
 
-// Configuración de la política de seguridad
+// Configuración de la política de seguridad con CSP
 app.use((req, res, next) => {
-    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://vercel.live; img-src 'self' data: https://*; connect-src 'self' https://vercel.live");
+    res.setHeader(
+        "Content-Security-Policy",
+        "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://vercel.live; img-src 'self' data: https://*; connect-src 'self' https://vercel.live"
+    );
     next();
 });
 
 // Conectar a MongoDB Atlas
 mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('Conectado a MongoDB Atlas'))
-  .catch(err => console.error('Error al conectar a MongoDB Atlas:', err));
+    .then(() => console.log('Conectado a MongoDB Atlas'))
+    .catch(err => console.error('Error al conectar a MongoDB Atlas:', err));
 
-// Ruta para la raíz del servidor
-app.get('/', (req, res) => {
-    res.send('<h1>Bienvenido al Servidor de Escaneo de Puertos</h1>');
+// Ruta para la raíz del servidor, muestra IPs escaneadas
+app.get('/', async (req, res) => {
+    try {
+        const datos = await ScanData.find();
+        let html = '<h1>Bienvenido al Servidor de Escaneo de Puertos</h1>';
+        html += '<h2>Datos de IPs Escaneadas:</h2><ul>';
+        datos.forEach(item => {
+            html += `<li><strong>IP:</strong> ${item.ip} - <strong>Puertos Abiertos:</strong> ${item.puertos_abiertos.join(', ')} - <strong>Fecha:</strong> ${new Date(item.fecha).toLocaleString()}</li>`;
+        });
+        html += '</ul>';
+        res.send(html);
+    } catch (error) {
+        res.status(500).send('<h1>Error al cargar los datos</h1>');
+    }
 });
 
 // Ruta para recibir y almacenar los datos de escaneo de puertos
@@ -50,3 +64,4 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
+
