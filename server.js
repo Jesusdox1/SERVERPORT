@@ -9,10 +9,7 @@ app.use(express.json()); // Middleware para analizar JSON
 
 // Configuración de la política de seguridad con CSP
 app.use((req, res, next) => {
-    res.setHeader(
-        "Content-Security-Policy",
-        "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' https://vercel.live; img-src 'self' data: https://*; connect-src 'self' https://vercel.live"
-    );
+    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*; connect-src 'self' https://vercel.live; frame-src 'self' https://vercel.live");
     next();
 });
 
